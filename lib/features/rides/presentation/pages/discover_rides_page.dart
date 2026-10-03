@@ -4,11 +4,31 @@ import '../../data/sample_rides.dart';
 import '../widgets/ride_card.dart';
 import 'ride_details_page.dart';
 
-class DiscoverRidesPage extends StatelessWidget {
+class DiscoverRidesPage extends StatefulWidget {
   const DiscoverRidesPage({super.key});
 
   @override
+  State<DiscoverRidesPage> createState() => _DiscoverRidesPageState();
+}
+
+class _DiscoverRidesPageState extends State<DiscoverRidesPage> {
+  static const _allLabel = 'All';
+
+  // Chip labels: "All" + unique skill levels from the data
+  late final List<String> _filters = [
+    _allLabel,
+    ...{for (final ride in sampleRides) ride.skillLevel},
+  ];
+
+  String _selected = _allLabel;
+
+  @override
   Widget build(BuildContext context) {
+    // Recomputed on every rebuild after setState
+    final rides = _selected == _allLabel
+        ? sampleRides
+        : sampleRides.where((r) => r.skillLevel == _selected).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('RoadBond'),
@@ -26,7 +46,20 @@ class DiscoverRidesPage extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 16),
-          for (final ride in sampleRides) ...[
+          Wrap(
+            spacing: 8,
+            children: [
+              for (final filter in _filters)
+                ChoiceChip(
+                  label: Text(filter),
+                  selected: _selected == filter,
+                  // setState triggers rebuild with new filtered list
+                  onSelected: (_) => setState(() => _selected = filter),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          for (final ride in rides) ...[
             RideCard(
               ride: ride,
               onTap: () {
