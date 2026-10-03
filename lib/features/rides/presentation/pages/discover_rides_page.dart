@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/sample_rides.dart';
 import '../widgets/ride_card.dart';
+import 'ride_details_page.dart';
 
 class DiscoverRidesPage extends StatelessWidget {
   const DiscoverRidesPage({super.key});
@@ -28,7 +29,13 @@ class DiscoverRidesPage extends StatelessWidget {
           for (final ride in sampleRides) ...[
             RideCard(
               ride: ride,
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => RideDetailsPage(ride: ride),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 12),
           ],
