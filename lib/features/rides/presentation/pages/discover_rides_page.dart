@@ -59,19 +59,30 @@ class _DiscoverRidesPageState extends State<DiscoverRidesPage> {
             ],
           ),
           const SizedBox(height: 16),
-          for (final ride in rides) ...[
-            RideCard(
-              ride: ride,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => RideDetailsPage(ride: ride),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-          ],
+          if (rides.isEmpty)
+            const Padding(
+              padding: EdgeInsets.only(top: 24),
+              child: Center(
+                child: Text(
+                  'No rides found for this level.\nTry another skill level.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+          else
+            for (final ride in rides) ...[
+              RideCard(
+                ride: ride,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => RideDetailsPage(ride: ride),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
         ],
       ),
     );
