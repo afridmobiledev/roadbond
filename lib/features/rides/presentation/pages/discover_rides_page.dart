@@ -14,21 +14,28 @@ class DiscoverRidesPage extends StatefulWidget {
 class _DiscoverRidesPageState extends State<DiscoverRidesPage> {
   static const _allLabel = 'All';
 
-  // Chip labels: "All" + unique skill levels from the data
   late final List<String> _filters = [
     _allLabel,
     ...{for (final ride in sampleRides) ride.skillLevel},
   ];
 
   String _selected = _allLabel;
+  String _query = '';
 
   @override
   Widget build(BuildContext context) {
-    // Recomputed on every rebuild after setState
-    final rides = _selected == _allLabel
-        ? sampleRides
-        : sampleRides.where((r) => r.skillLevel == _selected).toList();
 
+    // Recomputed on every rebuild after setState
+    final rides = sampleRides.where((ride) {
+      final matchesSkill =
+          _selected == _allLabel || ride.skillLevel == _selected;
+
+      final searchText =
+      '${ride.title} ${ride.startLocation}'.toLowerCase();
+      final matchesQuery = searchText.contains(_query.toLowerCase());
+
+      return matchesSkill && matchesQuery;
+    }).toList();
     return Scaffold(
       appBar: AppBar(
         title: const Text('RoadBond'),
@@ -40,10 +47,20 @@ class _DiscoverRidesPageState extends State<DiscoverRidesPage> {
             'Discover rides',
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Text(
             'Find your next route and ride with your crew.',
             style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            onChanged: (value) => setState(() => _query = value),
+            decoration: const InputDecoration(
+              labelText: 'Search rides',
+              hintText: 'Search by title or location',
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(),
+            ),
           ),
           const SizedBox(height: 16),
           Wrap(
