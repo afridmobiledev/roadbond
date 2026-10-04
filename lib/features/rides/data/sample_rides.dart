@@ -1,3 +1,4 @@
+// Dart (Flutter)
 import '../domain/ride.dart';
 
 final sampleRides = <Ride>[
@@ -10,6 +11,7 @@ final sampleRides = <Ride>[
     distanceMiles: 110,
     maxRiders: 12,
     joinedRiders: 7,
+    imageUrl: 'lib/assets/images/hudson_valley.jpg',
   ),
   Ride(
     id: 'brooklyn-coastal-loop',
@@ -20,6 +22,7 @@ final sampleRides = <Ride>[
     distanceMiles: 45,
     maxRiders: 10,
     joinedRiders: 4,
+    imageUrl: 'lib/assets/images/brooklyn_loop.jpg',
   ),
   Ride(
     id: 'bear-mountain-scenic',
@@ -30,5 +33,6 @@ final sampleRides = <Ride>[
     distanceMiles: 140,
     maxRiders: 8,
     joinedRiders: 6,
+    imageUrl: 'lib/assets/images/bear_mountain.jpg',
   ),
 ];

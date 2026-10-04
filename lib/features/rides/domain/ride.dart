@@ -1,3 +1,4 @@
+// Dart (Flutter)
 class Ride {
   const Ride({
     required this.id,
@@ -8,6 +9,7 @@ class Ride {
     required this.distanceMiles,
     required this.maxRiders,
     required this.joinedRiders,
+    required this.imageUrl,
   });
 
   final String id;
@@ -18,6 +20,7 @@ class Ride {
   final int distanceMiles;
   final int maxRiders;
   final int joinedRiders;
+  final String imageUrl;
 
   int get availableSpots => maxRiders - joinedRiders;
 }

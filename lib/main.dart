@@ -1,6 +1,6 @@
+// Dart (Flutter)
 import 'package:flutter/material.dart';
-
-import 'features/rides/presentation/pages/discover_rides_page.dart';
+import 'features/auth/presentation/pages/onboarding_welcome_page.dart';
 
 void main() {
   runApp(const RoadBondApp());
@@ -12,15 +12,9 @@ class RoadBondApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'RoadBond',
+      title: 'Road Bond',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFB3261E),
-        ),
-        useMaterial3: true,
-      ),
-      home: const DiscoverRidesPage(),
+      home: const OnboardingWelcomePage(),
     );
   }
 }
