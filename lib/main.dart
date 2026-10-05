@@ -1,6 +1,7 @@
 // Dart (Flutter)
 import 'package:flutter/material.dart';
-import 'features/auth/presentation/pages/onboarding_welcome_page.dart';
+
+import 'features/splash/splash_page.dart';
 
 void main() {
   runApp(const RoadBondApp());
@@ -11,10 +12,10 @@ class RoadBondApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Road Bond',
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const OnboardingWelcomePage(),
+      title: 'Road Bond',
+      home: SplashPage(),
     );
   }
 }
