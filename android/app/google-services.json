@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "332572654995",
+    "project_id": "roadbond-c83f8",
+    "storage_bucket": "roadbond-c83f8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:332572654995:android:a83987da5c56c4b601fc66",
+        "android_client_info": {
+          "package_name": "com.afridmobiledev.roadbond"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB82BusHJbEVCiXkshGsIHaYsq19SErnq4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,8 +1,10 @@
 // Dart (Flutter)
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/app_colors.dart';
 import '../home/home_shell_page.dart';
+import 'data/auth_repository.dart';
 import 'signup_page.dart';
 
 class SignInPage extends StatefulWidget {
@@ -13,14 +15,56 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  final _username = TextEditingController();
+  final _email = TextEditingController();
   final _password = TextEditingController();
+
+  final _authRepo = AuthRepository();
+  bool _isLoading = false;
 
   @override
   void dispose() {
-    _username.dispose();
+    _email.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSignIn() async {
+    final email = _email.text.trim();
+    final password = _password.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      _showSnackBar('Please enter your email and password.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _authRepo.signIn(email: email, password: password);
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeShellPage()),
+            (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      _showSnackBar(e.message ?? 'Invalid credentials.');
+    } catch (e) {
+      _showSnackBar('An unexpected error occurred. Please try again.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.textDark,
+      ),
+    );
   }
 
   @override
@@ -66,20 +110,22 @@ class _SignInPageState extends State<SignInPage> {
             ),
           ),
           const SizedBox(height: 24),
-          _buildInput('Username or Email', _username),
+          _buildInput(
+            'Email Address',
+            _email,
+            keyboard: TextInputType.emailAddress,
+          ),
           const SizedBox(height: 16),
-          _buildInput('Password', _password, isPassword: true),
+          _buildInput(
+            'Password',
+            _password,
+            isPassword: true,
+          ),
           const SizedBox(height: 28),
           SizedBox(
             height: 52,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeShellPage()),
-                  (route) => false,
-                );
-              },
+              onPressed: _isLoading ? null : _handleSignIn,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.textDark,
                 foregroundColor: Colors.white,
@@ -87,9 +133,21 @@ class _SignInPageState extends State<SignInPage> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
+              child: _isLoading
+                  ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+                  : const Text(
                 'Sign in',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
               ),
             ),
           ),
@@ -112,10 +170,11 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Widget _buildInput(
-    String label,
-    TextEditingController controller, {
-    bool isPassword = false,
-  }) {
+      String label,
+      TextEditingController controller, {
+        TextInputType? keyboard,
+        bool isPassword = false,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -130,6 +189,7 @@ class _SignInPageState extends State<SignInPage> {
         const SizedBox(height: 6),
         TextField(
           controller: controller,
+          keyboardType: keyboard,
           obscureText: isPassword,
           decoration: InputDecoration(
             filled: true,
