@@ -1,8 +1,10 @@
 // Dart (Flutter)
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/app_colors.dart';
 import '../home/home_shell_page.dart';
+import 'data/auth_repository.dart';
 import 'signin_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -17,6 +19,10 @@ class _SignUpPageState extends State<SignUpPage> {
   final _lastName = TextEditingController();
   final _email = TextEditingController();
   final _phone = TextEditingController();
+  final _password = TextEditingController();
+
+  final _authRepo = AuthRepository();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -24,7 +30,62 @@ class _SignUpPageState extends State<SignUpPage> {
     _lastName.dispose();
     _email.dispose();
     _phone.dispose();
+    _password.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSignUp() async {
+    final firstName = _firstName.text.trim();
+    final lastName = _lastName.text.trim();
+    final email = _email.text.trim();
+    final phone = _phone.text.trim();
+    final password = _password.text;
+
+    if (firstName.isEmpty || lastName.isEmpty || email.isEmpty || password.isEmpty) {
+      _showSnackBar('Please fill in all required fields.');
+      return;
+    }
+
+    if (password.length < 6) {
+      _showSnackBar('Password must be at least 6 characters.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _authRepo.signUp(
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,
+      );
+
+      if (!mounted) return;
+
+      // Navigate to home after successful registration
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeShellPage()),
+            (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      _showSnackBar(e.message ?? 'Authentication error');
+    } catch (e) {
+      _showSnackBar('An unexpected error occurred. Please try again.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.textDark,
+      ),
+    );
   }
 
   @override
@@ -85,17 +146,17 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
           const SizedBox(height: 14),
           _buildInput('Phone number', _phone, keyboard: TextInputType.phone),
+          const SizedBox(height: 14),
+          _buildInput(
+            'Password',
+            _password,
+            isPassword: true,
+          ),
           const SizedBox(height: 24),
           SizedBox(
             height: 52,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeShellPage()),
-                  (route) => false,
-                );
-              },
+              onPressed: _isLoading ? null : _handleSignUp,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.textDark,
                 foregroundColor: Colors.white,
@@ -103,9 +164,21 @@ class _SignUpPageState extends State<SignUpPage> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
+              child: _isLoading
+                  ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+                  : const Text(
                 'Sign Up',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
               ),
             ),
           ),
@@ -128,10 +201,11 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _buildInput(
-    String label,
-    TextEditingController controller, {
-    TextInputType? keyboard,
-  }) {
+      String label,
+      TextEditingController controller, {
+        TextInputType? keyboard,
+        bool isPassword = false,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -147,6 +221,7 @@ class _SignUpPageState extends State<SignUpPage> {
         TextField(
           controller: controller,
           keyboardType: keyboard,
+          obscureText: isPassword,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
